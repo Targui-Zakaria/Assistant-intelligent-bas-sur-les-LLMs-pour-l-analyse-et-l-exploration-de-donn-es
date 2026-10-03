@@ -42,6 +42,8 @@ def add_message(
     success: bool = True,
     show_sql: bool = False,
     show_download: bool = False,
+    show_chart: bool = False,
+    chart_question: str | None = None,
 ) -> None:
     st.session_state.messages.append(
         {
@@ -52,12 +54,14 @@ def add_message(
             "success": success,
             "show_sql": show_sql,
             "show_download": show_download,
+            "show_chart": show_chart,
+            "chart_question": chart_question,
         }
     )
 
 
 def last_ecommerce_result() -> dict | None:
     for msg in reversed(st.session_state.get("messages", [])):
-        if msg.get("role") == "assistant" and msg.get("sql"):
+        if msg.get("role") == "assistant" and msg.get("dataframe") is not None:
             return msg
     return None

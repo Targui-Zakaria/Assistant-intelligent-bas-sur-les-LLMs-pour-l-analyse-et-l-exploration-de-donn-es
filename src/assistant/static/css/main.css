@@ -14,7 +14,50 @@
   color: #111111 !important;
 }
 
-#MainMenu, footer, header { visibility: hidden; height: 0; }
+#MainMenu, footer { visibility: hidden; height: 0; }
+
+/* Garder le bouton << / >> pour ouvrir-fermer la barre latérale */
+[data-testid="stHeader"] {
+  visibility: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+[data-testid="stHeader"] [data-testid="stToolbar"],
+[data-testid="stHeader"] [data-testid="stDecoration"],
+[data-testid="stHeader"] [data-testid="stStatusWidget"] {
+  display: none !important;
+}
+
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 999999 !important;
+}
+
+[data-testid="stSidebarCollapsedControl"] button,
+[data-testid="stSidebarCollapseButton"] button {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  color: #111111 !important;
+}
+
+[data-testid="stSidebarCollapsedControl"] button:hover,
+[data-testid="stSidebarCollapseButton"] button:hover {
+  background: #f5f5f5 !important;
+  border-color: #cccccc !important;
+}
 
 .block-container {
   padding-top: 0.5rem !important;
@@ -238,6 +281,21 @@ body {
   color: #333333;
 }
 
+.welcome-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 55vh;
+  text-align: center;
+}
+.welcome-centered h1 {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: #111111;
+  letter-spacing: -0.02em;
+}
+
 .message {
   display: flex;
   margin-bottom: 1rem;
@@ -326,41 +384,37 @@ body {
   color: #111111;
 }
 
-/* === Barre de saisie unifiée (ChatGPT) === */
-.input-bar-shell {
-  max-width: 48rem;
-  margin: 0.5rem auto 1.25rem;
-  padding: 0 0.25rem;
-}
+/* === Barre de saisie unifiée (PDF + texte côte à côte) === */
 .input-bar-pdf-tag {
   font-size: 0.75rem;
   color: #555;
-  margin: 0 0 0.35rem 0.75rem;
+  max-width: 48rem;
+  margin: 0 auto 0.35rem;
+  padding-left: 0.75rem;
 }
-.input-bar-shell [data-testid="stHorizontalBlock"] {
-  align-items: center !important;
-  background: #ffffff;
-  border: 1px solid #d9d9e3;
-  border-radius: 26px;
-  padding: 0.35rem 0.5rem 0.35rem 0.25rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+[data-testid="stBottom"] {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 0 1rem 1rem;
 }
-.input-bar-shell [data-testid="stChatInput"] {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  max-width: 100% !important;
+
+[data-testid="stChatInput"] {
+  background: #ffffff !important;
+  border: 1px solid #d9d9e3 !important;
+  border-radius: 26px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: 0.35rem 0.5rem 0.35rem 0.35rem !important;
 }
-.input-bar-shell [data-testid="stChatInput"] > div {
+
+[data-testid="stChatInput"] > div {
   display: flex !important;
+  flex-direction: row !important;
   align-items: center !important;
-  gap: 0.25rem;
-  margin: 0 !important;
-  padding: 0 !important;
+  gap: 0.35rem !important;
 }
-.input-bar-shell [data-testid="stChatInput"] textarea {
+
+[data-testid="stChatInput"] textarea {
   min-height: 1.5rem !important;
   max-height: 8rem !important;
   padding: 0.5rem 0.25rem !important;
@@ -371,14 +425,38 @@ body {
   font-size: 0.95rem !important;
   line-height: 1.4 !important;
 }
-.input-bar-shell [data-testid="stChatInput"] textarea::placeholder {
+
+[data-testid="stChatInput"] textarea::placeholder {
   color: #8e8ea0 !important;
 }
-.input-bar-shell [data-testid="stChatInputSubmitButton"] {
+
+/* Bouton import PDF (à gauche, dans la barre) */
+[data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] button,
+[data-testid="stChatInput"] [data-testid="stChatInputUploadButton"] button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #555 !important;
+  min-width: 2.25rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-height: 2.25rem !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+}
+
+[data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] button:hover,
+[data-testid="stChatInput"] [data-testid="stChatInputUploadButton"] button:hover {
+  background: #f0f0f0 !important;
+}
+
+/* Bouton envoyer (à droite) */
+[data-testid="stChatInputSubmitButton"] {
   align-self: center !important;
   margin-bottom: 0 !important;
 }
-.input-bar-shell [data-testid="stChatInputSubmitButton"] button {
+
+[data-testid="stChatInputSubmitButton"] button {
   background: #111 !important;
   color: #fff !important;
   border: none !important;
@@ -388,60 +466,8 @@ body {
   min-height: 2rem !important;
   padding: 0 !important;
 }
-.input-bar-shell [data-testid="stChatInputSubmitButton"] button:disabled {
+
+[data-testid="stChatInputSubmitButton"] button:disabled {
   background: #d1d5db !important;
   color: #9ca3af !important;
-}
-
-/* Bouton PDF 📎 compact */
-.input-bar-shell .pdf-attach-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  min-height: 2.5rem;
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] {
-  width: 100%;
-  margin: 0 !important;
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] section {
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  min-height: 0 !important;
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] section > div {
-  padding: 0 !important;
-  gap: 0 !important;
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] small,
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] label,
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploaderDropzoneInstructions"],
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {
-  display: none !important;
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] button {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  min-width: 2.5rem !important;
-  width: 2.5rem !important;
-  height: 2.5rem !important;
-  min-height: 2.5rem !important;
-  padding: 0 !important;
-  font-size: 0 !important;
-  position: relative;
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] button::after {
-  content: "📎";
-  font-size: 1.25rem;
-  line-height: 1;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-.input-bar-shell .pdf-attach-wrap [data-testid="stFileUploader"] [data-testid="stFileUploaderFileName"] {
-  display: none !important;
 }

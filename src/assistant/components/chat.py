@@ -10,14 +10,14 @@ from src.assistant.utils.session import add_message
 logger = logging.getLogger(__name__)
 
 _WELCOME = """
-**Bienvenue** · Welcome · أهلاً · مرحبا
-
-Je réponds **uniquement** aux questions sur les **données e-commerce Olist**  
-(ventes, commandes, produits, clients, paiements…).
-
-Exemples : *top 5 produits vendus*, *montant moyen des paiements*.  
-Importez un **PDF** avec le bouton 📎 puis posez vos questions sur le document.
+<div class="welcome-centered">
+  <h1>Bienvenue</h1>
+</div>
 """
+
+
+def _render_welcome() -> None:
+    st.markdown(_WELCOME, unsafe_allow_html=True)
 
 
 def _user_bubble(text: str) -> None:
@@ -36,6 +36,8 @@ def _assistant_content(
     show_sql: bool = False,
     dataframe=None,
     show_download: bool = False,
+    show_chart: bool = False,
+    chart_question: str | None = None,
     success: bool = True,
 ) -> None:
     st.markdown('<div class="chat-msg-row chat-msg-left">', unsafe_allow_html=True)
@@ -47,7 +49,12 @@ def _assistant_content(
             st.code(sql, language="sql")
 
     if dataframe is not None and success:
-        render_dataframe(dataframe, show_download=show_download)
+        render_dataframe(
+            dataframe,
+            show_download=show_download,
+            show_chart=show_chart,
+            chart_question=chart_question,
+        )
 
     st.markdown("</div></div>", unsafe_allow_html=True)
 
@@ -62,13 +69,15 @@ def _render_single_message(message: dict) -> None:
             show_sql=message.get("show_sql", False),
             dataframe=message.get("dataframe"),
             show_download=message.get("show_download", False),
+            show_chart=message.get("show_chart", False),
+            chart_question=message.get("chart_question"),
             success=message.get("success", True),
         )
 
 
 def render_message_history() -> None:
     if not st.session_state.messages:
-        _assistant_content(_WELCOME)
+        _render_welcome()
         return
     for message in st.session_state.messages:
         _render_single_message(message)
@@ -88,6 +97,8 @@ def process_user_input(prompt: str, pipeline: dict) -> None:
                 success=result["success"],
                 show_sql=result.get("show_sql", False),
                 show_download=result.get("show_download", False),
+                show_chart=result.get("show_chart", False),
+                chart_question=result.get("chart_question"),
             )
         except Exception as exc:
             logger.exception("Erreur assistant")

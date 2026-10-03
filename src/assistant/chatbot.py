@@ -16,7 +16,7 @@ import streamlit as st
 from src.assistant.components.chat import render_message_history
 from src.assistant.components.input_bar import render_input_bar
 from src.assistant.components.sidebar import render_sidebar
-from src.assistant.components.templates import inject_template, render_header
+from src.assistant.components.templates import inject_template
 from src.assistant.services.assistant_service import get_pipeline
 from src.assistant.utils.config import load_environment
 from src.assistant.utils.session import init_session
@@ -51,9 +51,6 @@ def main() -> None:
 
     config = pipeline["config"]
     example = render_sidebar(pipeline["tables"], config.model)
-
-    question_count = len([m for m in st.session_state.messages if m["role"] == "user"])
-    render_header(config.model, len(pipeline["tables"]), question_count)
 
     st.markdown('<div class="chatgpt-thread">', unsafe_allow_html=True)
 

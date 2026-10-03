@@ -5,10 +5,10 @@ from src.assistant.utils.session import clear_history, clear_pdf_document, get_p
 
 EXAMPLE_QUESTIONS = [
     "Quels sont les 5 produits les plus vendus ?",
+    "Graphique des commandes par statut",
     "Quel est le montant moyen des paiements ?",
-    "Combien de commandes par statut ?",
+    "Camembert des ventes par catégorie",
     "Liste les 10 villes avec le plus de clients",
-    "Quel est le délai moyen de livraison en jours ?",
 ]
 
 
@@ -37,7 +37,7 @@ def render_sidebar(tables: list[str], model: str) -> str | None:
                 st.session_state.pop("_last_pdf_id", None)
                 st.rerun()
         else:
-            st.caption("Utilisez le bouton 📎 sous le chat pour importer un PDF.")
+            st.caption("Utilisez le bouton d'import dans la barre de message.")
 
         st.divider()
 

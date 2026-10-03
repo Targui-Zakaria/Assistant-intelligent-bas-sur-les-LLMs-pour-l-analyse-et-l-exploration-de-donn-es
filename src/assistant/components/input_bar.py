@@ -1,23 +1,24 @@
-"""Barre de saisie unifiée : PDF + message (style ChatGPT)."""
+"""Barre de saisie unifiée : PDF + message sur une seule ligne."""
 import streamlit as st
 
 from src.assistant.services.pdf_service import extract_text_from_pdf
 from src.assistant.utils.session import get_pdf_document, set_pdf_document
 
 
-def handle_pdf_upload(uploaded) -> None:
+def handle_pdf_upload(uploaded) -> bool:
+    """Importe un PDF. Retourne True si un nouveau document a été chargé."""
     if uploaded is None:
-        return
+        return False
     last = st.session_state.get("_last_pdf_id")
     file_id = f"{uploaded.name}_{uploaded.size}"
     if last == file_id:
-        return
+        return False
     st.session_state._last_pdf_id = file_id
     try:
         text, pages = extract_text_from_pdf(uploaded.getvalue())
         if not text.strip():
             st.warning("Le PDF ne contient pas de texte extractible.")
-            return
+            return False
         set_pdf_document(uploaded.name, text, pages)
         st.session_state.messages.append(
             {
@@ -34,45 +35,53 @@ def handle_pdf_upload(uploaded) -> None:
                 "show_download": False,
             }
         )
-        st.rerun()
+        return True
     except Exception as exc:
         st.error(f"Impossible de lire le PDF : {exc}")
+        return False
+
+
+def _extract_prompt(prompt) -> tuple[str, list]:
+    if hasattr(prompt, "text"):
+        return (prompt.text or "").strip(), list(prompt.files or [])
+    if isinstance(prompt, dict):
+        return (prompt.get("text") or "").strip(), list(prompt.get("files") or [])
+    return str(prompt).strip(), []
 
 
 def render_input_bar(pipeline: dict, example: str | None) -> None:
     doc = get_pdf_document()
-
-    st.markdown('<div class="input-bar-shell">', unsafe_allow_html=True)
-
     if doc:
         st.markdown(
-            f'<p class="input-bar-pdf-tag">PDF : {doc["name"]}</p>',
+            f'<p class="input-bar-pdf-tag">📄 {doc["name"]} — {doc["pages"]} page(s)</p>',
             unsafe_allow_html=True,
         )
 
-    row = st.container()
-    with row:
-        c_attach, c_chat = st.columns([0.55, 11.45], gap="small", vertical_alignment="center")
+    if example:
+        from src.assistant.components.chat import process_user_input
 
-        with c_attach:
-            st.markdown('<div class="pdf-attach-wrap">', unsafe_allow_html=True)
-            uploaded = st.file_uploader(
-                "PDF",
-                type=["pdf"],
-                label_visibility="collapsed",
-                key="pdf_uploader",
-                help="Importer un PDF",
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
-            handle_pdf_upload(uploaded)
+        process_user_input(example, pipeline)
+        return
 
-        with c_chat:
-            prompt = st.chat_input("Message à l'assistant…")
-            if example and not prompt:
-                prompt = example
-            if prompt:
-                from src.assistant.components.chat import process_user_input
+    prompt = st.chat_input(
+        "Message à l'assistant…",
+        accept_file=True,
+        file_type=["pdf"],
+        key="main_chat_input",
+    )
 
-                process_user_input(prompt, pipeline)
+    if not prompt:
+        return
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    text, files = _extract_prompt(prompt)
+    pdf_loaded = False
+    for uploaded in files:
+        if handle_pdf_upload(uploaded):
+            pdf_loaded = True
+
+    if text:
+        from src.assistant.components.chat import process_user_input
+
+        process_user_input(text, pipeline)
+    elif pdf_loaded:
+        st.rerun()
